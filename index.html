@@ -1,1 +1,313 @@
-index.html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title id="meta-title">DM Explorer - Trending Videos</title>
+    <meta name="description" id="meta-desc" content="Explore trending and search for your favorite videos from Dailymotion.">
+    
+    <!-- SEO & Social Meta Tags (Dynamic) -->
+    <meta property="og:type" content="website">
+    <meta property="og:title" id="og-title" content="DM Explorer">
+    <meta property="og:description" id="og-desc" content="Explore trending videos worldwide.">
+    <meta property="og:image" id="og-img" content="">
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .video-card { transition: transform 0.2s, box-shadow 0.2s; }
+        .video-card:hover { transform: translateY(-4px); box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1); }
+        .video-card:hover .play-overlay { opacity: 1; }
+        .play-overlay { transition: opacity 0.2s; opacity: 0; }
+        .hidden-view { display: none !important; }
+    </style>
+    
+    <!-- Structured Data Placeholder -->
+    <script id="video-schema" type="application/ld+json"></script>
+</head>
+<body class="bg-gray-50 min-h-screen">
+
+    <!-- Header -->
+    <header class="bg-white shadow-sm sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 py-4">
+            <div class="flex flex-col lg:flex-row items-center justify-between gap-4">
+                <h1 class="text-2xl font-bold text-blue-600 flex items-center gap-2 cursor-pointer" onclick="navigateHome()">
+                    <svg class="w-8 h-8" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 14.5v-9l6 4.5-6 4.5z"/></svg>
+                    DM Explorer
+                </h1>
+                
+                <div class="flex flex-1 max-w-2xl w-full gap-2">
+                    <input 
+                        type="text" 
+                        id="search-input" 
+                        placeholder="Search for videos..." 
+                        class="w-full px-4 py-2 border border-gray-300 rounded-l-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        onkeypress="if(event.key === 'Enter') handleSearchSubmit()"
+                    >
+                    <button 
+                        onclick="handleSearchSubmit()"
+                        class="bg-blue-600 text-white px-6 py-2 rounded-r-lg font-medium hover:bg-blue-700 transition"
+                    >
+                        Search
+                    </button>
+                </div>
+
+                <div class="flex items-center gap-2 text-sm">
+                    <span class="text-gray-500 font-medium mr-2">Trending:</span>
+                    <button onclick="navigateTrending('us')" class="hover:text-blue-600 px-2 py-1 rounded bg-gray-100 hover:bg-gray-200">🇺🇸 US</button>
+                    <button onclick="navigateTrending('gb')" class="hover:text-blue-600 px-2 py-1 rounded bg-gray-100 hover:bg-gray-200">🇬🇧 UK</button>
+                    <button onclick="navigateTrending('fr')" class="hover:text-blue-600 px-2 py-1 rounded bg-gray-100 hover:bg-gray-200">🇫🇷 FR</button>
+                    <button onclick="navigateTrending('in')" class="hover:text-blue-600 px-2 py-1 rounded bg-gray-100 hover:bg-gray-200">🇮🇳 IN</button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main View (List/Search) -->
+    <main id="main-view" class="max-w-7xl mx-auto px-4 py-8">
+        <div id="status-message" class="text-lg font-medium text-gray-700 mb-6 text-center">Trending Worldwide</div>
+        <div id="video-grid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6"></div>
+        
+        <div id="pagination-controls" class="hidden flex justify-center mt-12 gap-4">
+            <button id="prev-btn" onclick="changePage(-1)" class="px-4 py-2 border rounded-lg bg-white hover:bg-gray-50 disabled:opacity-30">Previous</button>
+            <span id="page-number" class="py-2 font-semibold">Page 1</span>
+            <button id="next-btn" onclick="changePage(1)" class="px-4 py-2 border rounded-lg bg-white hover:bg-gray-50 disabled:opacity-30">Next</button>
+        </div>
+    </main>
+
+    <!-- Detailed Player View -->
+    <main id="player-view" class="max-w-5xl mx-auto px-4 py-8 hidden-view">
+        <button onclick="navigateHome()" class="mb-6 flex items-center text-blue-600 hover:underline">
+            <svg class="w-5 h-5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg>
+            Back to Home
+        </button>
+
+        <div class="flex flex-col gap-8">
+            <div class="w-full">
+                <div class="aspect-video bg-black rounded-xl overflow-hidden shadow-lg">
+                    <iframe id="main-player" class="w-full h-full" frameborder="0" allow="autoplay; fullscreen" allowfullscreen></iframe>
+                </div>
+                <div class="mt-6 bg-white p-6 rounded-xl border border-gray-100 shadow-sm">
+                    <h2 id="video-title" class="text-2xl font-bold text-gray-900 mb-2"></h2>
+                    <div class="flex flex-wrap items-center gap-4 text-sm text-gray-500 mb-4 pb-4 border-b">
+                        <span id="video-owner" class="font-bold text-blue-600"></span>
+                        <span id="video-views"></span>
+                        <span id="video-duration" class="bg-gray-100 px-2 py-0.5 rounded"></span>
+                    </div>
+                    <div class="text-gray-700 leading-relaxed" id="video-desc"></div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        const FIELDS = {
+            grid: 'id,title,thumbnail_360_url,owner.screenname,views_total,duration',
+            detail: 'id,title,thumbnail_720_url,description,owner.screenname,views_total,duration,created_time'
+        };
+
+        // Routing Logic using Hash to avoid SecurityError in Blob environments
+        window.addEventListener('hashchange', handleRouting);
+        window.onload = handleRouting;
+
+        function handleRouting() {
+            const hash = window.location.hash.substring(1);
+            const params = new URLSearchParams(hash);
+            
+            const videoId = params.get('video');
+            const query = params.get('q');
+            const country = params.get('country');
+            const page = parseInt(params.get('page')) || 1;
+
+            if (videoId) {
+                showPlayer(videoId);
+            } else if (query) {
+                executeSearch(query, page);
+            } else {
+                executeTrending(country || '', page);
+            }
+        }
+
+        // Navigation Actions
+        function navigateHome() {
+            window.location.hash = '';
+        }
+
+        function navigateTrending(country) {
+            window.location.hash = `country=${country}&page=1`;
+        }
+
+        function handleSearchSubmit() {
+            const q = document.getElementById('search-input').value.trim();
+            if (q) {
+                window.location.hash = `q=${encodeURIComponent(q)}&page=1`;
+            }
+        }
+
+        function navigateVideo(id) {
+            window.location.hash = `video=${id}`;
+        }
+
+        // SEO and Meta Management
+        function updateMeta(title, desc, img, videoData = null) {
+            document.title = `${title} | DM Explorer`;
+            const metaTitle = document.getElementById('meta-title');
+            if(metaTitle) metaTitle.innerText = title;
+            
+            const metaDesc = document.getElementById('meta-desc');
+            if(metaDesc) metaDesc.content = desc;
+            
+            const ogTitle = document.getElementById('og-title');
+            if(ogTitle) ogTitle.content = title;
+            
+            const ogDesc = document.getElementById('og-desc');
+            if(ogDesc) ogDesc.content = desc;
+            
+            const ogImg = document.getElementById('og-img');
+            if(ogImg) ogImg.content = img;
+
+            // Structured Data
+            const schema = document.getElementById('video-schema');
+            if (videoData) {
+                const jsonLd = {
+                    "@context": "https://schema.org",
+                    "@type": "VideoObject",
+                    "name": videoData.title,
+                    "description": desc,
+                    "thumbnailUrl": img,
+                    "uploadDate": new Date(videoData.created_time * 1000).toISOString(),
+                    "duration": `PT${videoData.duration}S`,
+                    "embedUrl": `https://www.dailymotion.com/embed/video/${videoData.id}`,
+                    "interactionStatistic": {
+                        "@type": "InteractionCounter",
+                        "interactionType": "https://schema.org/WatchAction",
+                        "userInteractionCount": videoData.views_total
+                    }
+                };
+                schema.textContent = JSON.stringify(jsonLd);
+            } else {
+                schema.textContent = "";
+            }
+        }
+
+        // Content Cleaning
+        function cleanText(text) {
+            if (!text) return "";
+            return text.replace(/<br\s*\/?>/gi, ' ').replace(/<[^>]*>?/gm, '').trim();
+        }
+
+        function formatDuration(sec) {
+            const h = Math.floor(sec / 3600);
+            const m = Math.floor((sec % 3600) / 60);
+            const s = sec % 60;
+            return [h, m, s].map(v => v < 10 ? "0" + v : v).filter((v, i) => v !== "00" || i > 0).join(":");
+        }
+
+        // Data Fetching
+        async function executeTrending(country, page) {
+            switchView('main');
+            const status = document.getElementById('status-message');
+            status.innerText = country ? `Trending in ${country.toUpperCase()}` : "Trending Worldwide";
+            updateMeta("Trending Videos", "Watch the most popular videos currently trending on Dailymotion.", "");
+            
+            let url = `https://api.dailymotion.com/videos?sort=trending&fields=${FIELDS.grid}&limit=12&page=${page}`;
+            if (country) url += `&country=${country}`;
+            loadGrid(url, page);
+        }
+
+        async function executeSearch(query, page) {
+            switchView('main');
+            document.getElementById('status-message').innerText = `Results for "${query}"`;
+            updateMeta(`Search: ${query}`, `Find the best video results for ${query} on DM Explorer.`, "");
+            
+            const url = `https://api.dailymotion.com/videos?search=${encodeURIComponent(query)}&fields=${FIELDS.grid}&limit=12&page=${page}`;
+            loadGrid(url, page);
+        }
+
+        async function loadGrid(url, page) {
+            const grid = document.getElementById('video-grid');
+            const pagination = document.getElementById('pagination-controls');
+            grid.innerHTML = '<div class="col-span-full text-center py-20 text-gray-400">Loading...</div>';
+            
+            try {
+                const response = await fetch(url);
+                const data = await response.json();
+                grid.innerHTML = '';
+                data.list.forEach(v => grid.appendChild(createVideoCard(v)));
+                
+                document.getElementById('page-number').innerText = `Page ${page}`;
+                document.getElementById('prev-btn').disabled = (page === 1);
+                document.getElementById('next-btn').disabled = !data.has_more;
+                pagination.classList.toggle('hidden', data.list.length === 0);
+            } catch (e) {
+                grid.innerHTML = `<div class="col-span-full text-center text-red-500">Failed to load content.</div>`;
+            }
+        }
+
+        function createVideoCard(video) {
+            const div = document.createElement('div');
+            div.className = 'video-card bg-white rounded-xl overflow-hidden cursor-pointer border border-gray-100 group';
+            div.onclick = () => navigateVideo(video.id);
+            div.innerHTML = `
+                <div class="relative aspect-video">
+                    <img src="${video.thumbnail_360_url}" class="w-full h-full object-cover">
+                    <div class="play-overlay absolute inset-0 bg-black/30 flex items-center justify-center">
+                        <div class="bg-blue-600 text-white p-3 rounded-full shadow-xl transform scale-90 transition">
+                            <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+                        </div>
+                    </div>
+                    <span class="absolute bottom-2 right-2 bg-black/80 text-white text-xs px-2 py-0.5 rounded font-medium">${formatDuration(video.duration)}</span>
+                </div>
+                <div class="p-4">
+                    <h3 class="font-bold text-gray-800 line-clamp-2 h-10 text-sm mb-2">${cleanText(video.title)}</h3>
+                    <div class="flex justify-between items-center text-xs text-gray-500">
+                        <span>${cleanText(video['owner.screenname'])}</span>
+                        <span>${new Intl.NumberFormat().format(video.views_total)} views</span>
+                    </div>
+                </div>
+            `;
+            return div;
+        }
+
+        async function showPlayer(id) {
+            switchView('player');
+            try {
+                const response = await fetch(`https://api.dailymotion.com/video/${id}?fields=${FIELDS.detail}`);
+                const video = await response.json();
+
+                document.getElementById('main-player').src = `https://www.dailymotion.com/embed/video/${id}?autoplay=1`;
+                document.getElementById('video-title').innerText = cleanText(video.title);
+                document.getElementById('video-owner').innerText = cleanText(video['owner.screenname']);
+                document.getElementById('video-views').innerText = `${new Intl.NumberFormat().format(video.views_total)} views`;
+                document.getElementById('video-duration').innerText = formatDuration(video.duration);
+                document.getElementById('video-desc').innerText = cleanText(video.description) || "No description provided.";
+
+                updateMeta(video.title, cleanText(video.description).substring(0, 160), video.thumbnail_720_url, video);
+            } catch (e) {
+                console.error("Player load error");
+            }
+        }
+
+        function switchView(view) {
+            const main = document.getElementById('main-view');
+            const player = document.getElementById('player-view');
+            if (view === 'main') {
+                main.classList.remove('hidden-view');
+                player.classList.add('hidden-view');
+                document.getElementById('main-player').src = '';
+            } else {
+                main.classList.add('hidden-view');
+                player.classList.remove('hidden-view');
+            }
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function changePage(delta) {
+            const hash = window.location.hash.substring(1);
+            const params = new URLSearchParams(hash);
+            const currentP = parseInt(params.get('page')) || 1;
+            params.set('page', currentP + delta);
+            window.location.hash = params.toString();
+        }
+    </script>
+</body>
+</html>
