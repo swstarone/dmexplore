@@ -3,9 +3,16 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link type="image/png" sizes="16x16" rel="icon" href=".../icons8-video-arcade-16.png">
+    
     <title id="meta-title">DM Explorer - Trending Videos</title>
     <meta name="description" id="meta-desc" content="Explore trending and search for your favorite videos from Dailymotion.">
     
+    <!-- Google Fonts: Averia Libre -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Averia+Libre:ital,wght@0,300;0,400;0,700;1,300;1,400;1,700&display=swap" rel="stylesheet">
+
     <!-- SEO & Social Meta Tags (Dynamic) -->
     <meta property="og:type" content="website">
     <meta property="og:title" id="og-title" content="DM Explorer">
@@ -14,18 +21,18 @@
     
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-
-body {
-    font-family: "Averia Libre", system-ui;
-
-}
-
-        
+        body {
+            font-family: "Averia Libre", system-ui;
+        }
         .video-card { transition: transform 0.2s, box-shadow 0.2s; }
         .video-card:hover { transform: translateY(-4px); box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1); }
         .video-card:hover .play-overlay { opacity: 1; }
         .play-overlay { transition: opacity 0.2s; opacity: 0; }
         .hidden-view { display: none !important; }
+        
+        /* Custom scrollbar for horizontal selection list */
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
     </style>
     
     <!-- Structured Data Placeholder -->
@@ -57,13 +64,20 @@ body {
                         Search
                     </button>
                 </div>
+            </div>
 
-                <div class="flex items-center gap-2 text-sm">
-                    <span class="text-gray-500 font-medium mr-2">Trending:</span>
-                    <button onclick="navigateTrending('us')" class="hover:text-blue-600 px-2 py-1 rounded bg-gray-100 hover:bg-gray-200">🇺🇸 US</button>
-                    <button onclick="navigateTrending('gb')" class="hover:text-blue-600 px-2 py-1 rounded bg-gray-100 hover:bg-gray-200">🇬🇧 UK</button>
-                    <button onclick="navigateTrending('fr')" class="hover:text-blue-600 px-2 py-1 rounded bg-gray-100 hover:bg-gray-200">🇫🇷 FR</button>
-                    <button onclick="navigateTrending('in')" class="hover:text-blue-600 px-2 py-1 rounded bg-gray-100 hover:bg-gray-200">🇮🇳 IN</button>
+            <!-- Trending Country Selection -->
+            <div class="mt-4 flex items-center gap-3 overflow-x-auto no-scrollbar py-1">
+                <span class="text-gray-500 font-bold text-sm whitespace-nowrap">Trends by Country:</span>
+                <div class="flex gap-2">
+                    <button onclick="navigateTrending('us')" class="hover:text-blue-600 px-3 py-1 rounded bg-gray-100 hover:bg-gray-200 text-sm whitespace-nowrap">🇺🇸 USA</button>
+                    <button onclick="navigateTrending('gb')" class="hover:text-blue-600 px-3 py-1 rounded bg-gray-100 hover:bg-gray-200 text-sm whitespace-nowrap">🇬🇧 UK</button>
+                    <button onclick="navigateTrending('au')" class="hover:text-blue-600 px-3 py-1 rounded bg-gray-100 hover:bg-gray-200 text-sm whitespace-nowrap">🇦🇺 Australia</button>
+                    <button onclick="navigateTrending('ca')" class="hover:text-blue-600 px-3 py-1 rounded bg-gray-100 hover:bg-gray-200 text-sm whitespace-nowrap">🇨🇦 Canada</button>
+                    <button onclick="navigateTrending('in')" class="hover:text-blue-600 px-3 py-1 rounded bg-gray-100 hover:bg-gray-200 text-sm whitespace-nowrap">🇮🇳 India</button>
+                    <button onclick="navigateTrending('br')" class="hover:text-blue-600 px-3 py-1 rounded bg-gray-100 hover:bg-gray-200 text-sm whitespace-nowrap">🇧🇷 Brazil</button>
+                    <button onclick="navigateTrending('cn')" class="hover:text-blue-600 px-3 py-1 rounded bg-gray-100 hover:bg-gray-200 text-sm whitespace-nowrap">🇨🇳 China</button>
+                    <button onclick="navigateTrending('nz')" class="hover:text-blue-600 px-3 py-1 rounded bg-gray-100 hover:bg-gray-200 text-sm whitespace-nowrap">🇳🇿 New Zealand</button>
                 </div>
             </div>
         </div>
@@ -71,19 +85,19 @@ body {
 
     <!-- Main View (List/Search) -->
     <main id="main-view" class="max-w-7xl mx-auto px-4 py-8">
-        <div id="status-message" class="text-lg font-medium text-gray-700 mb-6 text-center">Trending Worldwide</div>
+        <div id="status-message" class="text-xl font-bold text-gray-800 mb-6 text-center">Trending in USA</div>
         <div id="video-grid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6"></div>
         
         <div id="pagination-controls" class="hidden flex justify-center mt-12 gap-4">
             <button id="prev-btn" onclick="changePage(-1)" class="px-4 py-2 border rounded-lg bg-white hover:bg-gray-50 disabled:opacity-30">Previous</button>
-            <span id="page-number" class="py-2 font-semibold">Page 1</span>
+            <span id="page-number" class="py-2 font-bold">Page 1</span>
             <button id="next-btn" onclick="changePage(1)" class="px-4 py-2 border rounded-lg bg-white hover:bg-gray-50 disabled:opacity-30">Next</button>
         </div>
     </main>
 
     <!-- Detailed Player View -->
     <main id="player-view" class="max-w-5xl mx-auto px-4 py-8 hidden-view">
-        <button onclick="navigateHome()" class="mb-6 flex items-center text-blue-600 hover:underline">
+        <button onclick="navigateHome()" class="mb-6 flex items-center text-blue-600 hover:underline font-bold">
             <svg class="w-5 h-5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg>
             Back to Home
         </button>
@@ -98,7 +112,7 @@ body {
                     <div class="flex flex-wrap items-center gap-4 text-sm text-gray-500 mb-4 pb-4 border-b">
                         <span id="video-owner" class="font-bold text-blue-600"></span>
                         <span id="video-views"></span>
-                        <span id="video-duration" class="bg-gray-100 px-2 py-0.5 rounded"></span>
+                        <span id="video-duration" class="bg-gray-100 px-2 py-0.5 rounded font-bold"></span>
                     </div>
                     <div class="text-gray-700 leading-relaxed" id="video-desc"></div>
                 </div>
@@ -112,7 +126,18 @@ body {
             detail: 'id,title,thumbnail_720_url,description,owner.screenname,views_total,duration,created_time'
         };
 
-        // Routing Logic using Hash to avoid SecurityError in Blob environments
+        const COUNTRY_NAMES = {
+            'us': 'USA',
+            'gb': 'UK',
+            'au': 'Australia',
+            'ca': 'Canada',
+            'in': 'India',
+            'br': 'Brazil',
+            'cn': 'China',
+            'nz': 'New Zealand'
+        };
+
+        // Routing Logic
         window.addEventListener('hashchange', handleRouting);
         window.onload = handleRouting;
 
@@ -130,7 +155,8 @@ body {
             } else if (query) {
                 executeSearch(query, page);
             } else {
-                executeTrending(country || '', page);
+                // Default to 'us' if no specific search/video/country is selected
+                executeTrending(country || 'us', page);
             }
         }
 
@@ -196,9 +222,10 @@ body {
             }
         }
 
-        // Content Cleaning
+        // Content Cleaning: Hide <br /> tags and clean render content
         function cleanText(text) {
             if (!text) return "";
+            // Replace <br /> with simple space and strip other HTML
             return text.replace(/<br\s*\/?>/gi, ' ').replace(/<[^>]*>?/gm, '').trim();
         }
 
@@ -213,8 +240,9 @@ body {
         async function executeTrending(country, page) {
             switchView('main');
             const status = document.getElementById('status-message');
-            status.innerText = country ? `Trending in ${country.toUpperCase()}` : "Trending Worldwide";
-            updateMeta("Trending Videos", "Watch the most popular videos currently trending on Dailymotion.", "");
+            const countryLabel = COUNTRY_NAMES[country] || "USA";
+            status.innerText = `Trending in ${countryLabel}`;
+            updateMeta(`Trending in ${countryLabel}`, `Watch the most popular videos currently trending in ${countryLabel} on Dailymotion.`, "");
             
             let url = `https://api.dailymotion.com/videos?sort=trending&fields=${FIELDS.grid}&limit=12&page=${page}`;
             if (country) url += `&country=${country}`;
@@ -233,20 +261,24 @@ body {
         async function loadGrid(url, page) {
             const grid = document.getElementById('video-grid');
             const pagination = document.getElementById('pagination-controls');
-            grid.innerHTML = '<div class="col-span-full text-center py-20 text-gray-400">Loading...</div>';
+            grid.innerHTML = '<div class="col-span-full text-center py-20 text-gray-400 font-bold">Loading videos...</div>';
             
             try {
                 const response = await fetch(url);
                 const data = await response.json();
                 grid.innerHTML = '';
-                data.list.forEach(v => grid.appendChild(createVideoCard(v)));
+                if (data.list && data.list.length > 0) {
+                    data.list.forEach(v => grid.appendChild(createVideoCard(v)));
+                } else {
+                    grid.innerHTML = '<div class="col-span-full text-center py-20 text-gray-400 font-bold">No videos found for this region.</div>';
+                }
                 
                 document.getElementById('page-number').innerText = `Page ${page}`;
                 document.getElementById('prev-btn').disabled = (page === 1);
                 document.getElementById('next-btn').disabled = !data.has_more;
                 pagination.classList.toggle('hidden', data.list.length === 0);
             } catch (e) {
-                grid.innerHTML = `<div class="col-span-full text-center text-red-500">Failed to load content.</div>`;
+                grid.innerHTML = `<div class="col-span-full text-center text-red-500 font-bold">Failed to load content. Please try again.</div>`;
             }
         }
 
@@ -262,13 +294,13 @@ body {
                             <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
                         </div>
                     </div>
-                    <span class="absolute bottom-2 right-2 bg-black/80 text-white text-xs px-2 py-0.5 rounded font-medium">${formatDuration(video.duration)}</span>
+                    <span class="absolute bottom-2 right-2 bg-black/80 text-white text-xs px-2 py-0.5 rounded font-bold">${formatDuration(video.duration)}</span>
                 </div>
                 <div class="p-4">
                     <h3 class="font-bold text-gray-800 line-clamp-2 h-10 text-sm mb-2">${cleanText(video.title)}</h3>
-                    <div class="flex justify-between items-center text-xs text-gray-500">
-                        <span>${cleanText(video['owner.screenname'])}</span>
-                        <span>${new Intl.NumberFormat().format(video.views_total)} views</span>
+                    <div class="flex justify-between items-center text-xs text-gray-500 font-bold">
+                        <span class="truncate pr-2">${cleanText(video['owner.screenname'])}</span>
+                        <span class="whitespace-nowrap">${new Intl.NumberFormat().format(video.views_total)} views</span>
                     </div>
                 </div>
             `;
