@@ -3,148 +3,248 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title id="meta-title">DM Explorer - Trending Global Videos</title>
+    <meta name="description" id="meta-desc" content="Explore trending videos from USA, UK, India, and more. Search millions of videos and stay updated with the world's most popular content via Dailymotion.">
     
-    <!-- PRIMARY META TAGS (Default for Home) -->
-    <title>DM Explorer - Trending Videos & Search</title>
-    <meta name="description" content="Discover the latest trending videos from around the world. Search and explore Dailymotion content easily with DM Explorer.">
-    
-    <!-- OPEN GRAPH / SOCIAL (Default) -->
-    <meta property="og:type" content="video.other">
-    <meta property="og:site_name" content="DM Explorer">
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Averia+Libre:wght@300;400;700&display=swap" rel="stylesheet">
     
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        body { font-family: "Averia Libre", system-ui; }
+        body { font-family: 'Averia Libre', system-ui; }
         .hidden-view { display: none !important; }
-        /* This ensures that even without JS, there's some text for robots to "see" */
-        #seo-fallback { position: absolute; left: -9999px; top: auto; width: 1px; height: 1px; overflow: hidden; }
+        .video-card:hover { transform: translateY(-2px); transition: transform 0.2s; }
+        /* Bot-only section for SEO fulfillment */
+        #bot-sitemap { position: absolute; left: -9999px; }
     </style>
 </head>
-<body class="bg-gray-50">
+<body class="bg-gray-50 flex flex-col min-h-screen">
 
-    <!-- SEO FALLBACK FOR ROBOTS -->
-    <div id="seo-fallback" aria-hidden="true">
-        <h1>DM Explorer - Video Search Engine</h1>
-        <p>Currently viewing trending videos and latest uploads on Dailymotion. Our platform allows you to search for high-quality video content across multiple categories including news, entertainment, and sports.</p>
+    <!-- SEO Bot Sitemap (Invisible to users, visible to crawlers) -->
+    <div id="bot-sitemap">
         <nav>
-            <a href="/?country=us">USA Trends</a>
-            <a href="/?country=gb">UK Trends</a>
-            <a href="/?country=in">India Trends</a>
+            <a href="#view=home">Home</a>
+            <a href="#view=trending&country=us">USA Trends</a>
+            <a href="#view=trending&country=gb">UK Trends</a>
+            <a href="#view=trending&country=in">India Trends</a>
+            <a href="#view=trending&country=fr">France Trends</a>
+            <a href="#view=about">About Us</a>
+            <a href="#view=terms">Terms of Service</a>
+            <a href="#view=privacy">Privacy Policy</a>
         </nav>
+        <p>All video content is provided by Dailymotion. For piracy issues, contact the Dailymotion legal team.</p>
     </div>
 
+    <!-- Header -->
     <header class="bg-white shadow-sm sticky top-0 z-50">
-        <div class="max-w-7xl mx-auto px-4 py-4 flex flex-col md:flex-row items-center justify-between gap-4">
-            <h1 class="text-2xl font-bold text-blue-600 cursor-pointer" onclick="navigateTo('/')">DM Explorer</h1>
-            <div class="flex flex-1 max-w-xl w-full">
-                <input id="search-input" type="text" placeholder="Search videos..." class="w-full border rounded-l-lg px-4 py-2 focus:ring-2 focus:ring-blue-500 outline-none">
-                <button onclick="handleSearch()" class="bg-blue-600 text-white px-6 py-2 rounded-r-lg hover:bg-blue-700">Search</button>
+        <div class="max-w-7xl mx-auto px-4 py-4">
+            <div class="flex flex-col lg:flex-row items-center justify-between gap-4">
+                <h1 class="text-2xl font-bold text-blue-600 flex items-center gap-2 cursor-pointer" onclick="navigate('home')">
+                    DM Explorer
+                </h1>
+                
+                <div class="flex flex-1 max-w-2xl w-full">
+                    <input id="search-input" type="text" placeholder="Search global videos..." class="w-full px-4 py-2 border rounded-l-lg focus:ring-2 focus:ring-blue-500 outline-none">
+                    <button onclick="handleSearch()" class="bg-blue-600 text-white px-6 py-2 rounded-r-lg hover:bg-blue-700">Search</button>
+                </div>
+            </div>
+
+            <!-- Country Selection -->
+            <div class="mt-4 overflow-x-auto no-scrollbar flex gap-2 pb-2">
+                <span class="text-sm font-bold text-gray-400 self-center mr-2">Regions:</span>
+                <button onclick="navigate('trending', {country: 'us'})" class="text-xs bg-white border px-3 py-1 rounded-full hover:bg-blue-50">🇺🇸 USA</button>
+                <button onclick="navigate('trending', {country: 'gb'})" class="text-xs bg-white border px-3 py-1 rounded-full hover:bg-blue-50">🇬🇧 UK</button>
+                <button onclick="navigate('trending', {country: 'in'})" class="text-xs bg-white border px-3 py-1 rounded-full hover:bg-blue-50">🇮🇳 India</button>
+                <button onclick="navigate('trending', {country: 'ca'})" class="text-xs bg-white border px-3 py-1 rounded-full hover:bg-blue-50">🇨🇦 Canada</button>
+                <button onclick="navigate('trending', {country: 'fr'})" class="text-xs bg-white border px-3 py-1 rounded-full hover:bg-blue-50">🇫🇷 France</button>
+                <button onclick="navigate('trending', {country: 'de'})" class="text-xs bg-white border px-3 py-1 rounded-full hover:bg-blue-50">🇩🇪 Germany</button>
+                <button onclick="navigate('trending', {country: 'br'})" class="text-xs bg-white border px-3 py-1 rounded-full hover:bg-blue-50">🇧🇷 Brazil</button>
+                <button onclick="navigate('trending', {country: 'jp'})" class="text-xs bg-white border px-3 py-1 rounded-full hover:bg-blue-50">🇯🇵 Japan</button>
+                <button onclick="navigate('trending', {country: 'au'})" class="text-xs bg-white border px-3 py-1 rounded-full hover:bg-blue-50">🇦🇺 Australia</button>
             </div>
         </div>
     </header>
 
-    <main id="view-container" class="max-w-7xl mx-auto px-4 py-8">
-        <!-- Content injected here -->
+    <main id="app-content" class="flex-grow max-w-7xl mx-auto w-full px-4 py-8">
+        <!-- Content will be injected here -->
     </main>
 
-    <!-- SCHEMA.ORG STRUCTURED DATA (Dynamically filled) -->
-    <script id="video-schema" type="application/ld+json">{}</script>
+    <!-- Footer with Legal Links -->
+    <footer class="bg-white border-t mt-12 py-8">
+        <div class="max-w-7xl mx-auto px-4">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8 text-sm text-gray-500 mb-6">
+                <div>
+                    <h4 class="font-bold text-gray-800 mb-3">DM Explorer</h4>
+                    <p>A global video search discovery tool powered by Dailymotion API. Explore content across all major countries and languages.</p>
+                </div>
+                <div>
+                    <h4 class="font-bold text-gray-800 mb-3">Legal</h4>
+                    <ul class="space-y-2">
+                        <li><button onclick="navigate('about')" class="hover:text-blue-600">About Us</button></li>
+                        <li><button onclick="navigate('terms')" class="hover:text-blue-600">Terms of Service</button></li>
+                        <li><button onclick="navigate('privacy')" class="hover:text-blue-600">Privacy Policy</button></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="font-bold text-gray-800 mb-3">Copyright Notice</h4>
+                    <p class="mb-2">All content is curated from Dailymotion. We do not host any files on our servers.</p>
+                    <p class="text-xs font-bold text-red-500 uppercase">For any copyright/piracy issues, please contact the Dailymotion Legal Team directly.</p>
+                </div>
+            </div>
+            <div class="border-t pt-6 text-center text-xs">
+                &copy; 2024 DM Explorer. Content provided by Dailymotion.
+            </div>
+        </div>
+    </footer>
+
+    <script id="json-ld" type="application/ld+json"></script>
 
     <script>
-        // ROUTING ENGINE (Using History API for cleaner SEO URLs)
-        function initRouter() {
-            window.onpopstate = () => route();
-            route();
-        }
+        const API_BASE = "https://api.dailymotion.com";
+        
+        // Router System
+        window.onhashchange = route;
+        window.onload = route;
 
-        async function route() {
-            const params = new URLSearchParams(window.location.search);
-            const videoId = params.get('v');
-            const query = params.get('q');
-            const country = params.get('country') || 'us';
-
-            if (videoId) {
-                renderPlayer(videoId);
-            } else if (query) {
-                renderList(`https://api.dailymotion.com/videos?search=${query}&limit=12&fields=id,title,thumbnail_360_url,owner.screenname`, `Results for "${query}"`);
-            } else {
-                renderList(`https://api.dailymotion.com/videos?sort=trending&country=${country}&limit=12&fields=id,title,thumbnail_360_url,owner.screenname`, `Trending in ${country.toUpperCase()}`);
+        function navigate(view, params = {}) {
+            let hash = `view=${view}`;
+            for (const key in params) {
+                hash += `&${key}=${encodeURIComponent(params[key])}`;
             }
+            window.location.hash = hash;
         }
 
-        function navigateTo(path) {
-            window.history.pushState({}, '', path);
-            route();
+        function route() {
+            const hash = window.location.hash.substring(1);
+            const params = new URLSearchParams(hash);
+            const view = params.get('view') || 'home';
+
+            switch(view) {
+                case 'home': renderTrending('us'); break;
+                case 'trending': renderTrending(params.get('country')); break;
+                case 'video': renderPlayer(params.get('id')); break;
+                case 'search': renderSearch(params.get('q')); break;
+                case 'about': renderStatic('About Us', 'DM Explorer is a third-party discovery engine for Dailymotion content. Our mission is to provide an easy-to-use interface for browsing trending videos globally. All video data, playback, and hosting are managed by Dailymotion SA.'); break;
+                case 'terms': renderStatic('Terms of Service', 'By using DM Explorer, you acknowledge that you are accessing content hosted on Dailymotion. Users must comply with Dailymotion\'s standard Terms of Service. We are not responsible for user-generated content or copyright violations occurring on the Dailymotion platform.'); break;
+                case 'privacy': renderStatic('Privacy Policy', 'DM Explorer does not store personal user data. We use standard browser local storage for preferences and the Dailymotion API for content retrieval. Third-party cookies may be used by the Dailymotion video player for analytics and advertising purposes.'); break;
+            }
+            window.scrollTo(0,0);
+        }
+
+        // Feature: Trending by Country
+        async function renderTrending(country) {
+            const countryCode = (country || 'us').toLowerCase();
+            updateMeta(`Trending in ${countryCode.toUpperCase()}`, `Browse the most watched videos in ${countryCode.toUpperCase()} today.`);
+            
+            const content = document.getElementById('app-content');
+            content.innerHTML = `<h2 class="text-2xl font-bold mb-6">Trending in ${countryCode.toUpperCase()}</h2><div id="grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">Loading...</div>`;
+            
+            try {
+                const res = await fetch(`${API_BASE}/videos?sort=trending&country=${countryCode}&fields=id,title,thumbnail_360_url,owner.screenname,views_total&limit=16`);
+                const data = await res.json();
+                renderVideoGrid(data.list);
+            } catch (e) { content.innerHTML = "Error loading trends."; }
+        }
+
+        // Feature: Search
+        async function renderSearch(query) {
+            updateMeta(`Results for ${query}`, `Find the best videos for ${query} on DM Explorer.`);
+            const content = document.getElementById('app-content');
+            content.innerHTML = `<h2 class="text-2xl font-bold mb-6">Search Results: ${query}</h2><div id="grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">Searching...</div>`;
+            
+            try {
+                const res = await fetch(`${API_BASE}/videos?search=${encodeURIComponent(query)}&fields=id,title,thumbnail_360_url,owner.screenname,views_total&limit=16`);
+                const data = await res.json();
+                renderVideoGrid(data.list);
+            } catch (e) { content.innerHTML = "Search failed."; }
+        }
+
+        // Feature: Player & SEO Metadata
+        async function renderPlayer(id) {
+            const content = document.getElementById('app-content');
+            content.innerHTML = "Loading video player...";
+
+            try {
+                const res = await fetch(`${API_BASE}/video/${id}?fields=id,title,description,thumbnail_720_url,owner.screenname,created_time,tags`);
+                const v = await res.json();
+
+                updateMeta(v.title, (v.description || "Watch this video on DM Explorer").substring(0, 160), v.thumbnail_720_url);
+                updateSchema(v);
+
+                content.innerHTML = `
+                    <div class="max-w-4xl mx-auto">
+                        <div class="aspect-video bg-black rounded-xl overflow-hidden shadow-2xl">
+                            <iframe src="https://www.dailymotion.com/embed/video/${id}?autoplay=1" class="w-full h-full" allowfullscreen></iframe>
+                        </div>
+                        <div class="mt-6 bg-white p-6 rounded-xl shadow-sm border">
+                            <h1 class="text-2xl font-bold text-gray-900">${v.title}</h1>
+                            <p class="text-blue-600 font-bold mb-4">${v['owner.screenname']}</p>
+                            <div class="text-gray-600 leading-relaxed whitespace-pre-wrap">${v.description || 'No description provided.'}</div>
+                            <div class="mt-4 p-4 bg-red-50 border-l-4 border-red-500 text-xs text-red-700">
+                                <strong>Legal Notice:</strong> This content is hosted by Dailymotion. If you believe this content violates copyright or piracy laws, please report it to the <a href="https://www.dailymotion.com/legal/copyright" target="_blank" class="underline">Dailymotion Legal Team</a>.
+                            </div>
+                        </div>
+                    </div>
+                `;
+            } catch (e) { content.innerHTML = "Video could not be loaded."; }
+        }
+
+        // Helper Functions
+        function renderVideoGrid(list) {
+            const grid = document.getElementById('grid');
+            if(!list || list.length === 0) {
+                grid.innerHTML = "No videos found.";
+                return;
+            }
+            grid.innerHTML = list.map(v => `
+                <div class="video-card bg-white rounded-xl shadow-sm overflow-hidden border border-gray-100 cursor-pointer" onclick="navigate('video', {id: '${v.id}'})">
+                    <img src="${v.thumbnail_360_url}" class="w-full aspect-video object-cover" alt="${v.title}">
+                    <div class="p-3">
+                        <h3 class="font-bold text-sm line-clamp-2 h-10 mb-1">${v.title}</h3>
+                        <p class="text-xs text-blue-500 font-bold">${v['owner.screenname']}</p>
+                        <p class="text-[10px] text-gray-400 mt-1">${new Intl.NumberFormat().format(v.views_total)} views</p>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function renderStatic(title, text) {
+            document.getElementById('app-content').innerHTML = `
+                <div class="max-w-2xl mx-auto bg-white p-8 rounded-xl border shadow-sm">
+                    <h2 class="text-3xl font-bold mb-6 text-gray-800">${title}</h2>
+                    <p class="text-gray-600 leading-relaxed">${text}</p>
+                    <button onclick="navigate('home')" class="mt-8 text-blue-600 font-bold hover:underline">← Back to Trends</button>
+                </div>
+            `;
+            updateMeta(title, text.substring(0, 160));
         }
 
         function handleSearch() {
             const q = document.getElementById('search-input').value;
-            if (q) navigateTo(`?q=${encodeURIComponent(q)}`);
+            if(q) navigate('search', {q});
         }
 
-        // VIEW RENDERING
-        async function renderList(url, title) {
-            const container = document.getElementById('view-container');
-            container.innerHTML = `<h2 class="text-xl font-bold mb-6">${title}</h2><div id="grid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6">Loading...</div>`;
-            
-            try {
-                const res = await fetch(url);
-                const data = await res.json();
-                const grid = document.getElementById('grid');
-                grid.innerHTML = data.list.map(v => `
-                    <div class="bg-white rounded-lg shadow-sm overflow-hidden cursor-pointer" onclick="navigateTo('?v=${v.id}')">
-                        <img src="${v.thumbnail_360_url}" class="w-full aspect-video object-cover">
-                        <div class="p-3">
-                            <h3 class="font-bold text-sm line-clamp-2">${v.title}</h3>
-                            <p class="text-xs text-gray-500 mt-1">${v['owner.screenname']}</p>
-                        </div>
-                    </div>
-                `).join('');
-                
-                // Update SEO for the list page
-                document.title = `${title} - DM Explorer`;
-            } catch (e) { container.innerHTML = "Error loading videos."; }
+        function updateMeta(title, desc, img = "") {
+            const fullTitle = `${title} | DM Explorer`;
+            document.title = fullTitle;
+            document.getElementById('meta-title').innerText = fullTitle;
+            document.getElementById('meta-desc').setAttribute('content', desc);
         }
 
-        async function renderPlayer(id) {
-            const container = document.getElementById('view-container');
-            container.innerHTML = "Loading video...";
-
-            try {
-                const res = await fetch(`https://api.dailymotion.com/video/${id}?fields=id,title,description,thumbnail_720_url,owner.screenname,created_time`);
-                const v = await res.json();
-
-                container.innerHTML = `
-                    <div class="max-w-4xl mx-auto">
-                        <div class="aspect-video bg-black rounded-xl overflow-hidden shadow-lg">
-                            <iframe src="https://www.dailymotion.com/embed/video/${id}?autoplay=1" class="w-full h-full" allowfullscreen></iframe>
-                        </div>
-                        <h1 class="text-2xl font-bold mt-6">${v.title}</h1>
-                        <p class="text-blue-600 font-bold">${v['owner.screenname']}</p>
-                        <hr class="my-4">
-                        <p class="text-gray-700">${v.description || 'No description available.'}</p>
-                    </div>
-                `;
-
-                // CRITICAL FOR SEO: Update tags & JSON-LD
-                document.title = `${v.title} - Watch on DM Explorer`;
-                
-                // Update Schema.org (Google reads this!)
-                const schema = {
-                    "@context": "https://schema.org",
-                    "@type": "VideoObject",
-                    "name": v.title,
-                    "description": v.description,
-                    "thumbnailUrl": v.thumbnail_720_url,
-                    "uploadDate": new Date(v.created_time * 1000).toISOString(),
-                    "embedUrl": `https://www.dailymotion.com/embed/video/${id}`
-                };
-                document.getElementById('video-schema').textContent = JSON.stringify(schema);
-
-            } catch (e) { container.innerHTML = "Error loading video details."; }
+        function updateSchema(v) {
+            const schema = {
+                "@context": "https://schema.org",
+                "@type": "VideoObject",
+                "name": v.title,
+                "description": v.description,
+                "thumbnailUrl": v.thumbnail_720_url,
+                "uploadDate": new Date(v.created_time * 1000).toISOString(),
+                "embedUrl": `https://www.dailymotion.com/embed/video/${v.id}`
+            };
+            document.getElementById('json-ld').textContent = JSON.stringify(schema);
         }
-
-        window.onload = initRouter;
     </script>
 </body>
 </html>
